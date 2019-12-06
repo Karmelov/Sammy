@@ -10,5 +10,5 @@ class TestUserResource(unittest.TestCase):
         ret = app.lambda_handler("", "")
         data = json.loads(ret["body"])
 
-        self.assertEquals(data["message"], "hello world")
+        self.assertEquals(data["message"], "Hello world")
 

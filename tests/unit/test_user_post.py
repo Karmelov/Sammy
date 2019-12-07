@@ -2,7 +2,7 @@ import json
 
 import unittest 
 
-from lambda_code.users import app
+from lambda_code.users.post import app
 
 class TestUserResource(unittest.TestCase):
     def test_lambda_handler(self):
@@ -10,5 +10,5 @@ class TestUserResource(unittest.TestCase):
         ret = app.lambda_handler("", "")
         data = json.loads(ret["body"])
 
-        self.assertEquals(data["message"], "Hello world")
+        self.assertEqual(data["message"], "postit")
 

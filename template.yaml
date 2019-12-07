@@ -10,18 +10,30 @@ Globals:
     Timeout: 3
 
 Resources:
-  HelloWorldFunction:
+  GetUsers:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: lambda_code/users/
+      CodeUri: lambda_code/users/get
       Handler: app.lambda_handler
       Runtime: python3.7
       Events:
-        HelloWorld:
+        GetUsers:
           Type: Api 
           Properties:
             Path: /users
             Method: get
+  PostUser:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda_code/users/post
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Events:
+        PostUser:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: post
 
 Outputs:
   HelloWorldApi:

@@ -1,4 +1,5 @@
 set -e
+sam validate
 tox -e py37-unit
 sam build
 sam local start-api &

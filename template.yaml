@@ -7,15 +7,19 @@ Description: >
 
 Globals:
   Function:
+    Handler: app.lambda_handler
+    Runtime: python3.7
     Timeout: 3
 
 Resources:
   GetUsers:
+    DependsOn: UsersTable
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: lambda_code/users/get
-      Handler: app.lambda_handler
-      Runtime: python3.7
+      Environment:
+        Variables:
+          USERS_TABLE_NAME: !Ref UsersTable
       Events:
         GetUsers:
           Type: Api 
@@ -23,25 +27,33 @@ Resources:
             Path: /users
             Method: get
   PostUser:
+    DependsOn: UsersTable
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: lambda_code/users/post
-      Handler: app.lambda_handler
-      Runtime: python3.7
+      Environment:
+        Variables:
+          USERS_TABLE_NAME: !Ref UsersTable
       Events:
         PostUser:
           Type: Api
           Properties:
             Path: /users
             Method: post
+  UsersTable:
+    Type: AWS::Dynamo::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: id
+        Type: Number
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
 
 Outputs:
   HelloWorldApi:
     Description: "API Gateway endpoint URL for Prod stage for Hello World function"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  HelloWorldFunction:
-    Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
   HelloWorldFunctionIamRole:
     Description: "Implicit IAM Role created for Hello World function"
     Value: !GetAtt HelloWorldFunctionRole.Arn

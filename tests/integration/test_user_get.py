@@ -11,5 +11,5 @@ class TestUserResource(unittest.TestCase):
         response = requests.get(self.URL)
         
         body = response.json()
-        self.assertEqual(body['message'], "Hello world")
+        self.assertEqual(body['message'], "UsersTable")
 

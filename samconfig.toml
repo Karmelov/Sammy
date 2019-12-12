@@ -2,7 +2,7 @@ version = 0.1
 [default]
 [default.deploy]
 [default.deploy.parameters]
-stack_name = "Sammy"
+stack_name = "Sammy-stage"
 s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1sprrsmeg9m3u"
 s3_prefix = "Sammy"
 region = "us-east-1"

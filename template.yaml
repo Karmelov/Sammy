@@ -17,6 +17,9 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: lambda_code/users/get
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref UsersTable
       Environment:
         Variables:
           USERS_TABLE_NAME: !Ref UsersTable
@@ -24,13 +27,16 @@ Resources:
         GetUsers:
           Type: Api 
           Properties:
-            Path: /users
+            Path: /users/{id}
             Method: get
   PostUser:
     DependsOn: UsersTable
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: lambda_code/users/post
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
       Environment:
         Variables:
           USERS_TABLE_NAME: !Ref UsersTable
@@ -42,15 +48,16 @@ Resources:
             Method: post
   UsersTable:
     Type: AWS::Serverless::SimpleTable
+    TableName: UsersTable
     Properties:
       PrimaryKey:
         Name: id
-        Type: Number
+        Type: String
       ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 2
 
 Outputs:
-  HelloWorldApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  SammyApi:
+    Description: "API Gateway endpoint URL for stage for Hello World function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"

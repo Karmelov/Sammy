@@ -3,7 +3,6 @@ jobs:
     executor: aws-serverless/default
     steps:
       - checkout
-      - aws-serverless/install
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "requirements.txt" }}
@@ -14,6 +13,7 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements.txt
+      - aws-serverless/install
       - save_cache:
           paths:
             - ./venv

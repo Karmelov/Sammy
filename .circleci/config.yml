@@ -36,6 +36,7 @@ jobs:
           name: run integration tests
           command: |
             . venv/bin/activate
+            export SAMMY_HOST=$(aws cloudformation describe-stacks --stack-name Sammy-stage --query "Stacks[0].Outputs[?OutputKey=='SammyApi'].OutputValue" --output text)
             tox -e py37-integration
 orbs:
   aws-serverless: circleci/aws-serverless@1.0.2

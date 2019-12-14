@@ -1,14 +1,6 @@
-version: 2.1
-orbs:
-  aws-serverless: circleci/aws-serverless@1.0.2
 jobs:
   build:
     executor: aws-serverless/default
-    docker:
-      - image: circleci/python:3.7.0
-
-    working_directory: ~/repo
-
     steps:
       - checkout
       - aws-serverless/install
@@ -45,4 +37,10 @@ jobs:
           command: |
             . venv/bin/activate
             tox -e py37-integration
-
+orbs:
+  aws-serverless: circleci/aws-serverless@1.0.2
+version: 2.1
+workflows:
+  validate-code:
+    jobs:
+      - build

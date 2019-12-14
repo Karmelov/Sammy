@@ -3,6 +3,7 @@ orbs:
   aws-serverless: circleci/aws-serverless@1.0.2
 jobs:
   build:
+    executor: aws-serverless/default
     docker:
       - image: circleci/python:3.7.0
 
@@ -10,42 +11,35 @@ jobs:
 
     steps:
       - checkout
-
-      # Download and cache dependencies
+      - aws-serverless/install
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "requirements.txt" }}
             - v1-dependencies-
-
       - run:
           name: install dependencies
           command: |
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements.txt
-
       - save_cache:
           paths:
             - ./venv
           key: v1-dependencies-{{ checksum "requirements.txt" }}
-
       - run:
           name: validate template
           command: |
             sam validate
-
       - run:
           name: run unit tests
           command: |
             . venv/bin/activate
             tox -e py37-unit
-
       - run:
           name: deploy on stage
           command: |
             sam build 
             sam deploy
-
       - run:
           name: run integration tests
           command: |

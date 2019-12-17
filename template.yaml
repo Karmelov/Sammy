@@ -47,14 +47,30 @@ Resources:
             Path: /users
             Method: post
   UsersTable:
-    Type: AWS::Serverless::SimpleTable
-    TableName: UsersTable
+    Type: AWS::DynamoDB::Table
     Properties:
-      PrimaryKey:
-        Name: id
-        Type: String
+      TableName: UsersTable
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: username
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: usernameIndex
+          KeySchema:
+            - AttributeName: username
+              KeyType: HASH
+          Projection:
+            NonKeyAttributes: []
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 2
+            WriteCapacityUnits: 2
       ProvisionedThroughput:
-        ReadCapacityUnits: 1
+        ReadCapacityUnits: 2
         WriteCapacityUnits: 2
 
 Outputs:

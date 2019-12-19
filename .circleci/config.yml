@@ -1,6 +1,16 @@
 version: 2
 jobs:
-  build:
+  deploy_to_prod:
+    docker:
+      - image: circleci/python:3.7.1
+    steps:
+      - checkout
+      - deploy:
+          name: deploy on prod
+          command: |
+            sam build
+            sam deploy --stack-name Sammy
+  run_tests_on_branch:
     docker:
       - image: circleci/python:3.7.1
     steps:
@@ -12,8 +22,8 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            PYTHON_PATH=$(python3 -m site --user-base)
-            export PATH=$PATH:$PYTHON_PATH
+            PYTHON_BINS_PATH=$(python3 -m site --user-base)
+            export PATH=$PATH:$PYTHON_BINS_PATH
             python3 -m venv venv
             . venv/bin/activate
             sudo pip3 install -r requirements.txt
@@ -24,21 +34,35 @@ jobs:
           key: v2-dependencies-{{ checksum "requirements.txt" }}
       - run:
           name: validate template
-          command: |
-            sam validate
+          command: sam validate
       - run:
           name: run unit tests
-          command: |
-            . venv/bin/activate
-            tox -e py37-unit
+          command: tox -e py37-unit
       - run:
           name: deploy on stage
           command: |
-            sam build 
+            sam build
             sam deploy
       - run:
           name: run integration tests
           command: |
-            . venv/bin/activate
             export SAMMY_HOST=$(aws cloudformation describe-stacks --stack-name Sammy-stage --query "Stacks[0].Outputs[?OutputKey=='SammyApi'].OutputValue" --output text)
             tox -e py37-integration
+
+workflows:
+  version: 2
+  test_branches:
+    jobs:
+      - run_tests_on_branch:
+          filters:
+            branches:
+              ignore:
+                - master
+  deploy_master:
+    jobs:
+      - deploy_to_prod:
+          filters:
+            branches:      
+              only:
+                - master
+

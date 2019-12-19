@@ -5,6 +5,9 @@ jobs:
       - image: circleci/python:3.7.1
     steps:
       - checkout
+      - run:
+          name: install sam
+          command: sudo pip3 install awscli aws-sam-cli
       - deploy:
           name: deploy on prod
           command: |
@@ -51,7 +54,7 @@ jobs:
 
 workflows:
   version: 2
-  test_branches:
+  test_branch:
     jobs:
       - run_tests_on_branch:
           filters:

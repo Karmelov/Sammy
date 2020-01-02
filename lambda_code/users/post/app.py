@@ -1,9 +1,12 @@
-import boto3
+from repository import Repository
 import json
 import os
 import uuid
 
 USERS_TABLE = os.environ['USERS_TABLE_NAME'] 
+
+users_repository = Repository(USERS_TABLE)
+
 
 def lambda_handler(event, context):
     str_body = event['body']
@@ -27,17 +30,13 @@ def lambda_handler(event, context):
             })
         }
 
-    client = boto3.resource('dynamodb')
-
-    table = client.Table(USERS_TABLE)
-
     uid = uuid.uuid4()
     item = {
         'id': uid.hex,
         'username': username,
         'password': password
     }
-    table.put_item(Item=item)
+    users_repository.put_item(item)
 
     return {
         "statusCode": 200,

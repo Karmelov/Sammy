@@ -3,7 +3,7 @@ from mock import Mock, ANY, patch
 import unittest 
 import boto3
 
-from lambda_code.users.post.repository import Repository 
+from layers.repositories.repository import Repository 
 
 @patch('boto3.resource')
 class TestUserResource(unittest.TestCase): 

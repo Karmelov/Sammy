@@ -17,6 +17,8 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: lambda_code/users/get
+      Layers:
+        - !Ref Repositories
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref UsersTable
@@ -34,6 +36,8 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: lambda_code/users/post
+      Layers:
+        - !Ref Repositories
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UsersTable
@@ -71,6 +75,16 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2
+  Repositories:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: Sammy-Repositories
+      Description: Repositories to access model's data
+      ContentUri: layers/repositories
+      CompatibleRuntimes:
+        - python3.7
+      LicenseInfo: 'MIT'
+      RetentionPolicy: Retain
 
 Outputs:
   SammyApi:

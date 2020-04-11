@@ -1,9 +1,12 @@
+import sys
+sys.path.append('./layers/repositories/python/lib/python3.7/site-packages')
+
 import json
 from mock import Mock, ANY, patch
 import unittest 
 import boto3
 
-from lambda_code.users.post.repository import Repository 
+from repository import Repository 
 
 @patch('boto3.resource')
 class TestUserResource(unittest.TestCase): 

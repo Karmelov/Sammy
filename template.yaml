@@ -62,7 +62,7 @@ Resources:
         - AttributeName: id
           KeyType: HASH
       GlobalSecondaryIndexes:
-        - IndexName: usernameIndex
+        - IndexName: username-index
           KeySchema:
             - AttributeName: username
               KeyType: HASH
@@ -80,7 +80,7 @@ Resources:
     Properties:
       LayerName: SammyRepositories
       Description: Repositories to access model's data
-      ContentUri: layers/repositories
+      ContentUri: layers/SammyService
       CompatibleRuntimes:
         - python3.7
       LicenseInfo: 'MIT'

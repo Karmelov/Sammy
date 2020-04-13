@@ -1,11 +1,11 @@
-from repository import Repository
 import json
 import os
 import uuid
 
-USERS_TABLE = os.environ['USERS_TABLE_NAME'] 
+from sammy.repositories.user_repository import UserRepository
+from sammy.managers.password_manager import PasswordManager
 
-users_repository = Repository(USERS_TABLE)
+user_repository = UserRepository()
 
 
 def lambda_handler(event, context):
@@ -15,7 +15,7 @@ def lambda_handler(event, context):
     username = body.get('username')
     if not username:
         return {
-            "responseCode": 400,
+            "statusCode": 400,
             "body": json.dumps({
                 "message": "'username' field missing"
             })
@@ -24,23 +24,32 @@ def lambda_handler(event, context):
     password = body.get('password')
     if not password:
         return {
-            "responseCode": 400,
+            "statusCode": 400,
             "body": json.dumps({
                 "message": "'password' field missing"
             })
         }
 
+    if user_repository.get_item_by_secondary_index(username) is not None:
+        return {
+            "statusCode": 403,
+            "body": json.dumps({
+                "message": "User already exists"
+            })
+        }
+
     uid = uuid.uuid4()
+    hashed_password = PasswordManager.hash_password(password)
     item = {
         'id': uid.hex,
         'username': username,
-        'password': password
+        'password': hashed_password 
     }
-    users_repository.put_item(item)
+    user_repository.put_item(item)
 
     return {
         "statusCode": 200,
         "body": json.dumps({
             "id": uid.hex        
         })
-    }    
+    }

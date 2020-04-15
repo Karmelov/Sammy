@@ -1,4 +1,5 @@
 *.pyc
 .tox/
 *.swp
+local_envs.json
 .aws-sam/

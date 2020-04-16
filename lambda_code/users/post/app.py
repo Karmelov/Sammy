@@ -2,10 +2,9 @@ import json
 import os
 import uuid
 
-from sammy.repositories.user_repository import UserRepository
-from sammy.managers.password_manager import PasswordManager
+from sammy.services.users_service import UsersService
 
-user_repository = UserRepository()
+users_service = UsersService()
 
 
 def lambda_handler(event, context):
@@ -30,7 +29,9 @@ def lambda_handler(event, context):
             })
         }
 
-    if user_repository.get_item_by_secondary_index(username) is not None:
+    try:
+        user = users_service.create_user(username, password)
+    except ValueError as ex:
         return {
             "statusCode": 403,
             "body": json.dumps({
@@ -38,18 +39,9 @@ def lambda_handler(event, context):
             })
         }
 
-    uid = uuid.uuid4()
-    hashed_password = PasswordManager.hash_password(password)
-    item = {
-        'id': uid.hex,
-        'username': username,
-        'password': hashed_password 
-    }
-    user_repository.put_item(item)
-
     return {
         "statusCode": 200,
         "body": json.dumps({
-            "id": uid.hex        
+            "id": user['id']        
         })
     }

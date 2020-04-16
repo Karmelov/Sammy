@@ -52,16 +52,16 @@ class TestUserResource(unittest.TestCase):
             Item='item'
         )
 
-    def test_get_item_by_secondary_index(self, mocked_resource):
+    def test_query_items_by_secondary_index(self, mocked_resource):
         self.mock_tables(mocked_resource)
         self.mocked_table.query.return_value = {
             'Items': ['item']        
         }
 
         repo = BaseRepository('table_name', 'index', 'secondary_index')
-        result = repo.get_item_by_secondary_index('value')
+        result = repo.query_by_secondary_index('value')
 
-        self.assertEqual(result, 'item')
+        self.assertEqual(result[0], 'item')
         self.mocked_table.query.assert_called_once_with(
             IndexName='secondary_index-index',
             KeyConditionExpression=Key('secondary_index').eq('value')

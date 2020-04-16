@@ -1,2 +1,3 @@
-sam local start-api --skip-pull-image --env-vars=./config/local_envs.json
+sam build
+sam local start-api --env-vars=./config/local_envs.json
 

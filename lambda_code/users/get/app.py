@@ -1,14 +1,14 @@
-from sammy.repositories.user_repository import UserRepository
+from sammy.services.users_service import UsersService
 import json
 import os
 
 
-user_repository = UserRepository()
+users_service = UsersService()
 
 def lambda_handler(event, context):
     user_id = event['pathParameters']['id']
 
-    user = user_repository.get_item(user_id)
+    user = users_service.get_user_by_id(user_id)
 
     if user:
         return {

@@ -2,14 +2,13 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
   Sammy
-
   Sample SAM Template for Sammy
 
 Globals:
   Function:
     Handler: app.lambda_handler
     Runtime: python3.7
-    Timeout: 3
+    Timeout: 5
 
 Resources:
   GetUsers:
@@ -22,9 +21,12 @@ Resources:
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref UsersTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref JwtSecret
       Environment:
         Variables:
           USERS_TABLE_NAME: !Ref UsersTable
+          JWT_SECRET_NAME: !Ref JwtSecret
       Events:
         GetUsers:
           Type: Api 
@@ -41,14 +43,39 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UsersTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref JwtSecret
       Environment:
         Variables:
           USERS_TABLE_NAME: !Ref UsersTable
+          JWT_SECRET_NAME: !Ref JwtSecret
       Events:
         PostUser:
           Type: Api
           Properties:
             Path: /users
+            Method: post
+  Auth:
+    DependsOn: UsersTable
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda_code/auth
+      Layers:
+        - !Ref Repositories
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref JwtSecret
+      Environment:
+        Variables:
+          USERS_TABLE_NAME: !Ref UsersTable
+          JWT_SECRET_NAME: !Ref JwtSecret
+      Events:
+        AuthUser:
+          Type: Api
+          Properties:
+            Path: /auth
             Method: post
   UsersTable:
     Type: AWS::DynamoDB::Table
@@ -85,6 +112,9 @@ Resources:
         - python3.7
       LicenseInfo: 'MIT'
       RetentionPolicy: Retain
+  JwtSecret:
+    Type: AWS::SecretsManager::Secret
+ 
 
 Outputs:
   SammyApi:

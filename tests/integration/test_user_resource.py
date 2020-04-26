@@ -8,7 +8,6 @@ from random import random
 HOST = os.environ['SAMMY_HOST']
 
 class TestUserResource(unittest.TestCase):
-    URL = HOST + 'users'
 
     def setUp(self):
         self.username = 'user' + str(random())
@@ -19,7 +18,7 @@ class TestUserResource(unittest.TestCase):
             'password': '1234'
         }
         response = requests.post(
-            self.URL,
+            HOST + 'users',
             json=new_user_data
         )
         
@@ -30,20 +29,51 @@ class TestUserResource(unittest.TestCase):
         uid = body['id']
         
         response = requests.get(
-            self.URL + '/' + uid
+            HOST + 'users/' + uid
         )
         body = response.json()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(body['username'], self.username)
 
-    def test_user_already_exists(self):
+        response = requests.post(
+            HOST + 'auth',
+            json=new_user_data
+        )
+        body = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(body['token'])
 
+    def test_user_uses_incorrect_password(self):
         new_user_data = {
             'username': self.username,
             'password': '1234'
         }
         response = requests.post(
-            self.URL,
+            HOST + 'users',
+            json=new_user_data
+        )
+        
+        body = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(body['id'])
+
+        new_user_data['password'] = 'abcd'
+        response = requests.post(
+            HOST + 'auth',
+            json=new_user_data
+        )
+        body = response.json()
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(body['message'], "Invalid credentials")
+
+
+    def test_user_already_exists(self):
+        new_user_data = {
+            'username': self.username,
+            'password': '1234'
+        }
+        response = requests.post(
+            HOST + 'users',
             json=new_user_data
         )
         
@@ -52,7 +82,7 @@ class TestUserResource(unittest.TestCase):
         self.assertIsNotNone(body['id'])
 
         response = requests.post(
-            self.URL,
+            HOST + 'users',
             json=new_user_data
         )
         
